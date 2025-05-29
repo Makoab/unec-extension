@@ -1,3 +1,4 @@
+#unec-extension
 UNEC Elektron Jurnal Viewer Chrome Extension
 This Chrome extension provides a convenient way to view your UNEC (Azerbaijan State University of Economics) Elektron Jurnal (Electronic Journal) course information directly from your browser popup, without needing to navigate through the UNEC portal. It fetches and displays key details for each course, including grades and attendance.
 
