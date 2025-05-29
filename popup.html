@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 450px;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .courses-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .courses-table th,
+        .courses-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 13px;
+        }
+        
+        .courses-table th {
+            background: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .courses-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .courses-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .total-credits {
+            margin-top: 10px;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3>UNEC Elektron Jurnal</h3>
+    </div>
+    
+    <div class="form-group">
+        <label for="eduYear">Tədris ili seçin:</label>
+        <select id="eduYear">
+            <option value="">--Tədris ilini seçin--</option>
+            <option value="1000044">2024 - 2025</option>
+            <option value="1000043">2023 - 2024</option>
+            <option value="1000042">2022 - 2023</option>
+            <option value="1000041">2021 - 2022</option>
+            <option value="1000040">2020 - 2021</option>
+            <option value="1000039">2019 - 2020</option>
+            <option value="1000018">2018 - 2019</option>
+            <option value="1000008">2017 - 2018</option>
+            <option value="1000005">2016 - 2017</option>
+            <option value="1000004">2015 - 2016</option>
+            <option value="1000006">2014 - 2015</option>
+            <option value="1000009">2013 - 2014</option>
+            <option value="1000010">2012 - 2013</option>
+            <option value="1000011">2011 - 2012</option>
+            <option value="1000012">2010 - 2011</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label for="eduSemester">Semestr seçin:</label>
+        <select id="eduSemester">
+            <option value="">--Semestri seçin--</option>
+            <option value="1000105">I semestr</option>
+            <option value="1000107">II semestr</option>
+            <option value="1000108">Yay semestri</option>
+        </select>
+    </div>
+    
+    <button id="fetchData">Məlumatları Göstər</button>
+    
+    <div id="loading" class="loading" style="display: none;">
+        Məlumatlar yüklənir...
+    </div>
+    
+    <div id="error" class="error" style="display: none;"></div>
+    
+    <div id="results" style="display: none;">
+        <div class="success">Məlumatlar uğurla yükləndi!</div>
+        <table class="courses-table">
+            <thead>
+                <tr>
+                    <th>Fənn Adı</th>
+                    <th>Kredit</th>
+                    <th>Kollokvium orta balı</th>
+                    <th>Seminar orta balı</th>
+                    <th>Yekun</th>
+                    <th>Qaib faizi</th>
+                    <th>Qaib Sayı</th> </tr>
+                </tr>
+            </thead>
+            <tbody id="coursesBody">
+            </tbody>
+        </table>
+        <div id="totalCredits" class="total-credits"></div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
