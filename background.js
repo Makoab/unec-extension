@@ -1,48 +1,74 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'fetchCourseData') {
+    if (request.action === 'fetchSemesters') {
+        handleFetchSemesters(request, sendResponse);
+        return true; // Keep the message channel open for async response
+    } else if (request.action === 'fetchCourseData') {
         handleFetchCourseData(request, sendResponse);
         return true; // Keep the message channel open for async response
     }
+    // Optional: handle unknown actions
+    // else {
+    //     console.warn('Unknown action received in background:', request.action);
+    //     sendResponse({ success: false, error: 'Unknown action' });
+    // }
+    return false; // Explicitly return false if not handling async
 });
 
-async function handleFetchCourseData(request, sendResponse) {
+async function handleFetchSemesters(request, sendResponse) {
     try {
-        // Create offscreen document if it doesn't exist
-        await setupOffscreenDocument();
-        
-        // Send message to offscreen document to fetch data
+        await setupOffscreenDocumentIfNeeded(); // Ensure offscreen document is ready
+
         const response = await chrome.runtime.sendMessage({
             target: 'offscreen',
-            action: 'fetchData',
-            eduYear: request.eduYear,
-            eduSemester: request.eduSemester
+            action: 'getSemesters', // New action for offscreen
+            eduYear: request.eduYear
         });
-        
         sendResponse(response);
     } catch (error) {
-        console.error('Background script error:', error);
+        console.error('Background script error (fetchSemesters):', error);
         sendResponse({
             success: false,
-            error: 'Xəta baş verdi: ' + error.message
+            error: 'Semestrləri əldə edərkən xəta: ' + error.message
         });
     }
 }
 
-async function setupOffscreenDocument() {
-    // Check if offscreen document already exists
+async function handleFetchCourseData(request, sendResponse) {
+    try {
+        await setupOffscreenDocumentIfNeeded(); // Ensure offscreen document is ready
+
+        const response = await chrome.runtime.sendMessage({
+            target: 'offscreen',
+            action: 'fetchData', // Existing action for offscreen
+            eduYear: request.eduYear,
+            eduSemester: request.eduSemester
+        });
+        sendResponse(response);
+    } catch (error) {
+        console.error('Background script error (fetchCourseData):', error);
+        sendResponse({
+            success: false,
+            error: 'Kurs məlumatlarını əldə edərkən xəta: ' + error.message
+        });
+    }
+}
+
+async function setupOffscreenDocumentIfNeeded() {
     const existingContexts = await chrome.runtime.getContexts({
         contextTypes: ['OFFSCREEN_DOCUMENT'],
         documentUrls: [chrome.runtime.getURL('offscreen.html')]
     });
 
     if (existingContexts.length > 0) {
-        return; // Offscreen document already exists
+        console.log('Offscreen document already exists.');
+        return;
     }
 
-    // Create offscreen document
+    console.log('Creating offscreen document...');
     await chrome.offscreen.createDocument({
         url: 'offscreen.html',
-        reasons: ['DOM_SCRAPING'],
-        justification: 'Fetch course data from UNEC student portal'
+        reasons: ['DOM_SCRAPING', 'IFRAME_SCRIPTING'], // Added IFRAME_SCRIPTING as fetch is like a sub-request
+        justification: 'Fetch semester and course data from UNEC student portal'
     });
+    console.log('Offscreen document created.');
 }
