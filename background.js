@@ -1,26 +1,42 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'fetchSemesters') {
+    if (request.action === 'fetchAcademicYears') {
+        handleFetchAcademicYears(sendResponse);
+        return true;
+    } else if (request.action === 'fetchSemesters') {
         handleFetchSemesters(request, sendResponse);
-        return true; // Keep the message channel open for async response
+        return true;
     } else if (request.action === 'fetchCourseData') {
         handleFetchCourseData(request, sendResponse);
-        return true; // Keep the message channel open for async response
+        return true;
     }
-    // Optional: handle unknown actions
-    // else {
-    //     console.warn('Unknown action received in background:', request.action);
-    //     sendResponse({ success: false, error: 'Unknown action' });
-    // }
-    return false; // Explicitly return false if not handling async
+    return false;
 });
+
+async function handleFetchAcademicYears(sendResponse) {
+    try {
+        await setupOffscreenDocumentIfNeeded();
+        console.log('Background: Requesting academic years from offscreen.');
+        const response = await chrome.runtime.sendMessage({
+            target: 'offscreen',
+            action: 'getAcademicYears'
+        });
+        sendResponse(response);
+    } catch (error) {
+        console.error('Background script error (fetchAcademicYears):', error);
+        sendResponse({
+            success: false,
+            error: 'Tədris illərini əldə edərkən xəta: ' + error.message
+        });
+    }
+}
 
 async function handleFetchSemesters(request, sendResponse) {
     try {
-        await setupOffscreenDocumentIfNeeded(); // Ensure offscreen document is ready
-
+        await setupOffscreenDocumentIfNeeded();
+        console.log('Background: Requesting semesters from offscreen for year:', request.eduYear);
         const response = await chrome.runtime.sendMessage({
             target: 'offscreen',
-            action: 'getSemesters', // New action for offscreen
+            action: 'getSemesters',
             eduYear: request.eduYear
         });
         sendResponse(response);
@@ -35,11 +51,11 @@ async function handleFetchSemesters(request, sendResponse) {
 
 async function handleFetchCourseData(request, sendResponse) {
     try {
-        await setupOffscreenDocumentIfNeeded(); // Ensure offscreen document is ready
-
+        await setupOffscreenDocumentIfNeeded();
+        console.log('Background: Requesting course data from offscreen for year:', request.eduYear, 'semester:', request.eduSemester);
         const response = await chrome.runtime.sendMessage({
             target: 'offscreen',
-            action: 'fetchData', // Existing action for offscreen
+            action: 'fetchData',
             eduYear: request.eduYear,
             eduSemester: request.eduSemester
         });
@@ -60,15 +76,15 @@ async function setupOffscreenDocumentIfNeeded() {
     });
 
     if (existingContexts.length > 0) {
-        console.log('Offscreen document already exists.');
+        // console.log('Offscreen document already exists.');
         return;
     }
 
-    console.log('Creating offscreen document...');
+    // console.log('Creating offscreen document...');
     await chrome.offscreen.createDocument({
         url: 'offscreen.html',
-        reasons: ['DOM_SCRAPING', 'IFRAME_SCRIPTING'], // Added IFRAME_SCRIPTING as fetch is like a sub-request
-        justification: 'Fetch semester and course data from UNEC student portal'
+        reasons: ['DOM_SCRAPING', 'IFRAME_SCRIPTING'],
+        justification: 'Fetch academic years, semesters, and course data from UNEC student portal'
     });
-    console.log('Offscreen document created.');
+    // console.log('Offscreen document created.');
 }
