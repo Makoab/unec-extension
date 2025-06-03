@@ -13,7 +13,7 @@ A Chrome extension that provides convenient access to your UNEC (Azerbaijan Stat
 - **Kredit** (Credits)
 - **Kollokvium orta balı** (Midterm Average Score)
 - **Seminarın orta balı** (Seminar Average Score)
-- **Yekun** (Current Assessment / Final Score)
+- **Giriş balı** (Current Assessment)
 - **Qaib faizi** (Absence Percentage)
 - **Qaib Sayı** (Calculated Absences based on credits and percentage)
 
